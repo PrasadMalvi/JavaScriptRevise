@@ -9,11 +9,11 @@ console.log(a);
 let b = 1;
 console.log(b);
 b = "Prasad";
-let b = 5; // cannot Redeclare
+// let b = 5; // cannot Redeclare
 console.log(b);
 
 //COnst ES+6 - > Block Scope and Cannot be Reassigned
 const c = 2;
 c = "Malvi"; // Throws Error Assignment to a constant variable
-const c = 50; // Cannot Redeclare
+// const c = 50; // Cannot Redeclare
 console.log(c);
