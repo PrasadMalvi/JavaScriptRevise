@@ -32,6 +32,10 @@ app.get("/about", (req, res) => {
     }
   });
 }); */
-const myServer = http.createServer(app);
+
+/* const myServer = http.createServer(app);
 
 myServer.listen(8000, () => console.log("Server Running on 8000"));
+ */
+
+app.listen(8000, () => console.log("Server Running on 8000"));
