@@ -1,8 +1,12 @@
 const express = require("express");
-const users = require("./MOCK_DATA.json");
+let users = require("./MOCK_DATA.json");
+const fs = require("fs");
 
 const app = express();
 const PORT = 8000;
+
+//Middleware - Plugin
+app.use(express.urlencoded({ extended: false }));
 
 //Routes
 app.get("/users", (req, res) => {
@@ -26,15 +30,60 @@ app
     return res.json(user);
   })
   .patch((req, res) => {
-    return res.json({ status: "Pending" });
+    const id = Number(req.params.id);
+    const updates = req.body;
+    let user = users.find((user) => user.id === id);
+    if (!user) {
+      return res.status(404).json({
+        status: "Error",
+        message: "User not found",
+      });
+    }
+    Object.assign(user, updates);
+    fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          status: "Error",
+          message: "Failed to update user in the file",
+        });
+      }
+      return res.json({ status: "Success", user });
+    });
   })
   .delete((req, res) => {
-    return res.json({ status: "Pending" });
+    const id = Number(req.params.id);
+
+    const userExist = users.find((user) => user.id === id);
+    if (!userExist) {
+      return res.status(404).json({
+        status: "Error",
+        message: "User not found",
+      });
+    }
+
+    users = users.filter((user) => user.id !== id);
+
+    fs.writeFile("./MOCK_DATA.json", JSON.stringify(users, null, 2), (err) => {
+      if (err) {
+        return res.status(500).json({
+          status: "Error",
+          message: "Failed to delete user in the file",
+        });
+      }
+      return res.json({
+        status: "Success",
+        message: `User ${id} deleted successfully`,
+        users,
+      });
+    });
   });
 
 app.post("/api/users", (req, res) => {
-  //TODO : Create NewUser
-  return res.json({ status: "Pending" });
+  const body = req.body;
+  users.push({ ...body, id: users.length + 1 });
+  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+    return res.json({ status: "Success", id: users.length });
+  });
 });
 
 app.listen(PORT, () => console.log(`Server runnning on Port ${PORT}`));
